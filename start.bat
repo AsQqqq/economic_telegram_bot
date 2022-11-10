@@ -7,10 +7,13 @@ echo select to:
 echo.
 echo 1. Start BOT
 echo 2. Start VENV
+echo 3. Start CMD
+echo 4. Create VENV and install libraries
+echo 5. only Installing Libraries
 echo ================
-echo 3. exit
+echo 6. exit
 echo.
-choice /c 123 /m "input: "
+choice /c 123456 /m "input: "
 
 call :Choice%ErrorLevel%
 goto :Repeat
@@ -19,7 +22,7 @@ endlocal
 exit /b 0
 
 :Choice1
-	start startbot.bat
+	start BAT\startbot.bat
 	exit
 
 :Choice2
@@ -27,6 +30,18 @@ exit /b 0
 	exit
 
 :Choice3
+	cls
+    cmd
+
+:Choice4
+	start BAT\create_install.bat
+	exit
+
+:Choice5
+	start BAT\install.bat
+	exit
+
+:Choice6
 	exit
 
 :Choice0
