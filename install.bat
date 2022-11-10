@@ -31,12 +31,13 @@ echo echo the files have been installed and created, run through the start.bat f
 echo timeout 15 >> pre_install.bat
 echo cls >> pre_install.bat
 echo echo thanks for installing >> pre_install.bat
-echo timeout 10 >> pre_install.bat
+echo del requirements.txt >> pre_install.bat
 echo exit >> pre_install.bat
+
 start pre_install.bat
 
 echo %echo off > start.bat
-echo if exist install.bat (del install.bat del pre_install.bat) >> start.bat
+echo if exist pre_install.bat (del pre_install.bat) >> start.bat
 echo call venv\Scripts\activate.bat >> start.bat
 echo python app.py >> start.bat
 echo pause >> start.bat
@@ -46,4 +47,4 @@ if not exist config.py (
     echo TOKEN="AaBbCcDd:1A2B3C4D" >> config.py
 )
 
-exit
+del install.bat || exit
