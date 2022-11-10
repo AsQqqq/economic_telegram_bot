@@ -43,8 +43,8 @@ echo python app.py >> start.bat
 echo pause >> start.bat
 
 if not exist config.py (
-    echo ADMINS=1234567 > config.py
-    echo TOKEN="AaBbCcDd:1A2B3C4D" >> config.py
+    echo ADMINS=1234567(ADMIN_ID) > config.py
+    echo TOKEN="AaBbCcDd:1A2B3C4D"(TOKEN) >> config.py
 )
 
 del install.bat || exit
