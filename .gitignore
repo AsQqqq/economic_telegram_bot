@@ -295,3 +295,4 @@ cython_debug/
 ### Files Ignore ###
 config.py
 venv/
+.edea
