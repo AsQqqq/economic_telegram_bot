@@ -1,6 +1,9 @@
 @echo off
 setlocal enableextensions enabledelayedexpansion
 
+echo Hello! You were met by the launch system version 0.1
+echo
+
 :Repeat
 
 echo select to:
@@ -22,28 +25,28 @@ endlocal
 exit /b 0
 
 :Choice1
-	start BAT\startbot.bat
-	exit
+    start BAT\startbot.bat
+    exit
 
 :Choice2
     start venv\Scripts\activate.bat
-	exit
+    exit
 
 :Choice3
-	cls
+    cls
     cmd
 
 :Choice4
-	start BAT\create_install.bat
-	exit
+    start BAT\create_install.bat
+    exit
 
 :Choice5
-	start BAT\install.bat
-	exit
+    start BAT\install.bat
+    exit
 
 :Choice6
-	exit
+    exit
 
 :Choice0
-	rem Nothing to do
-	exit /b 0
+    rem Nothing to do
+    exit /b 0
