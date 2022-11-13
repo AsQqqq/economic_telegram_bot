@@ -7,7 +7,7 @@ from aiogram import types
 from datetime import timedelta, datetime
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from keyboard import main_menu_kb, ndfl_false_kb, ndfl_true_kb, not_keyboard, setting_inline_kb
+from keyboard import main_menu_kb, ndfl_false_kb, ndfl_true_kb, not_keyboard, setting_inline_kb, setting_keyboard, editNdfl_keyboard
 from handler.message_edit import message_delete
 
 #процент НДФЛ 
@@ -48,6 +48,95 @@ async def test_persent(message: types.Message):
         #если пишет пользователь то даем понять что он просто написал сообщение, проигнорив его
         pass
 
+#хандлер для меню настроек
+async def setting_bot(message: types.Message):
+    #удаление сообщения пользователя
+    await message.delete()
+    global global_setting_menu
+    #запуск инлайн клавиатуры и вывод текста
+    global_setting_menu_msg = await message.answer("Выбери пункт для настройки или помощи", reply_markup=setting_keyboard)
+    #таймер
+    date_25s = datetime.now() + timedelta(seconds=25)
+    #удаление сообщения по таймеру
+    scheduler.add_job(message_delete, "date", run_date=date_25s, kwargs={"message":global_setting_menu_msg})
+
+#вот так выглядит запуск от инлайн клавиатуры
+@dp.callback_query_handler(text='persent_ndfl')
+#это хандлер запускающий этот стейт
+async def print_persent_ndfl(call: types.CallbackQuery):
+    #удаление предыдущего сообщения
+    await call.message.delete()
+    #делаем из числа процент
+    NDFL = percent_ndfl*100
+    #выводим процет НДФЛ
+    msg = await call.message.answer(f"Текущий процент НДФЛ: {NDFL}%", reply_markup=editNdfl_keyboard)
+    #создаем переменную с секундами
+    date_30s = datetime.now() + timedelta(seconds=30)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_30s, kwargs={"message":msg})
+
+#вот так выглядит запуск от инлайн клавиатуры
+@dp.callback_query_handler(text='help_commands')
+#это хандлер запускающий этот стейт
+async def help_command_inline(call: types.CallbackQuery):
+    #удаление предыдущего сообщения
+    await call.message.delete()
+    #выводим текст
+    msg = await call.message.answer("Все команды:\n/last - Последний результат!\n/connect - Связаться с разработчиком\n\nЭто меню можно вызвать командой /help!")
+    #создаем переменную с секундами
+    date_15s = datetime.now() + timedelta(seconds=15)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_15s, kwargs={"message":msg})
+
+#это хандлер запускающий этот стейт
+async def help_command(message: types.Message):
+    #удаление предыдущего сообщения
+    await message.delete()
+    #выводим текст
+    msg = await message.answer("Все команды:\n/last - Последний результат!\n/connect - Связаться с разработчиком\n\nЭто меню можно вызвать в меню настроек")
+    #создаем переменную с секундами
+    date_15s = datetime.now() + timedelta(seconds=15)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_15s, kwargs={"message":msg})
+
+msg_text = None
+
+#это хандлер запускающий этот стейт
+async def last_command(message: types.Message):
+    #удаление предыдущего сообщения
+    await message.delete()
+    
+    if not msg_text == None:
+        #выводим текст
+        msg = await message.answer(f"Ваша последняя операция:\n{msg_text}")
+    else:
+        msg = await message.answer("Вы еще не выполняли операций")
+    #создаем переменную с секундами
+    date_15s = datetime.now() + timedelta(seconds=15)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_15s, kwargs={"message":msg})
+
+#это хандлер запускающий этот стейт
+async def connect_command(message: types.Message):
+    #удаление предыдущего сообщения
+    await message.delete()
+    #выводим текст
+    msg = await message.answer("Разработчик бота - https://github.com/AsQqqq")
+    #создаем переменную с секундами
+    date_15s = datetime.now() + timedelta(seconds=15)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_15s, kwargs={"message":msg})
+
+#хандлер для удаления лишних сообщений
+async def no_message(message:types.Message):
+    #удаление сообщения
+    await message.delete()
+    #ввывод текста
+    msg = await message.answer('Не понятное слово... введи /start или /help')
+    #таймер и удаление сообщений бота
+    date_10s = datetime.now() + timedelta(seconds=10)
+    scheduler.add_job(message_delete, "date", run_date=date_10s, kwargs={"message": msg})
+
 #===================setting=====================
 
 #это создание библеотеки стейтов. Тут идет запись в оперативную память сервера
@@ -55,14 +144,16 @@ class state_setting_ndfl(StatesGroup):
     #название стейта и его модуль(... = State())
     ndfl_setting_state = State()
 
+#вот так выглядит запуск от инлайн клавиатуры
+@dp.callback_query_handler(text='edit_ndfl')
 #это хандлер запускающий этот стейт
-async def setting_bot(message: types.Message):
+async def edit_persent_ndfl(call: types.CallbackQuery):
+    #удаление предыдущего сообщения
+    await call.message.delete()
     #обьявление глобальной переменной
     global msg_id_setting_bot_id
-    #удаление последнего сообщения пользователя
-    await message.delete()
     #вывод текста с переменной и плюс клавиатура с отменением стейта
-    msg_id_setting_bot = await message.answer('Напиши новый процент НДФЛ(к примеру 13 или 5 и тп)', reply_markup=not_keyboard)
+    msg_id_setting_bot = await call.message.answer('Напиши новый процент НДФЛ(к примеру 13 или 5 и тп)', reply_markup=not_keyboard)
     #из переменной вытягиваем только ее айди для будущих манипуляций
     msg_id_setting_bot_id = msg_id_setting_bot.message_id
     #запускаем стейт и ждем следующих действий в next хандлерах
@@ -96,7 +187,11 @@ async def setting_ndfl_state(message: types.Message, state: FSMContext):
     #изменяем переменную в самом начале кода(14 строчка)
     percent_ndfl = percent
     #редактируем сообщение и выводим ризультат
-    await bot.edit_message_text(chat_id=message.chat.id, message_id=msg_id_setting_bot_id, text=(f'Ваш новый процент: {percent_new}%'))
+    msg = await bot.edit_message_text(chat_id=message.chat.id, message_id=msg_id_setting_bot_id, text=(f'Ваш новый процент: {percent_new}%'))
+    #создаем переменную с секундами
+    date_20s = datetime.now() + timedelta(seconds=20)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_20s, kwargs={"message":msg})
     #отключаем стейт
     await state.finish()
 
@@ -158,8 +253,17 @@ async def hour_work(message: types.Message, state: FSMContext):
     else:
         round_works_other_hour = str(round(hours_worked_per))
         round_works = round_works_other_hour + " часов"
+    persent_ndfl_nice = percent_ndfl*100
     #выводим пользователю
-    await bot.edit_message_text(chat_id=message.chat.id, message_id=msg_id_true_bot_id, text=(f'Ваша заработная плата за {round_works}:\n{variable_one} рублей,\nпри условии что {round(float(rate_per_hour_per))} рублей в час'))
+    msg = await bot.edit_message_text(chat_id=message.chat.id, message_id=msg_id_true_bot_id, text=(f'Ваша заработная плата за {round_works}:\n{variable_one} рублей,\nпри условии что {round(float(rate_per_hour_per))} рублей в час и коммисией {persent_ndfl_nice}%'))
+    #создаем переменную с секундами
+    date_20s = datetime.now() + timedelta(seconds=20)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_20s, kwargs={"message":msg})
+    
+    global msg_text
+    msg_text = msg.text
+
     #завершение стейта
     await state.finish()
 
@@ -226,42 +330,64 @@ async def hour_work_false(message: types.Message, state: FSMContext):
         round_works_other_hour = str(round(hours_worked_per))
         round_works = round_works_other_hour + " часов"
     #выводим пользователю
-    await bot.edit_message_text(chat_id=message.chat.id, message_id=msg_id_false_bot_id, text=(f'Ваша заработная плата за {round_works}:\n{variable_one} рублей,\nпри условии что {round(float(rate_per_hour_per))} рублей в час'))
+    msg = await bot.edit_message_text(chat_id=message.chat.id, message_id=msg_id_false_bot_id, text=(f'Ваша заработная плата за {round_works}:\n{variable_one} рублей,\nпри условии что {round(float(rate_per_hour_per))} рублей в час'))
+    #создаем переменную с секундами
+    date_20s = datetime.now() + timedelta(seconds=20)
+    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
+    scheduler.add_job(message_delete, "date", run_date=date_20s, kwargs={"message":msg})
 
+    global msg_text
+    msg_text = msg.text
 
     await state.finish()
 
 #===================stop=state==================
 
-
-#скоро доделаю!
+#хандлер для отмены стейтов
 @dp.callback_query_handler(text='stop_state', state='*')
 async def not_state(call: types.CallbackQuery, state: FSMContext):
+    #удаление сообщния стейта
+    await call.message.delete()
+    #попадаем в выключаемый стейт
     current_state = await state.get_state()
+    #если стейт равен None то возращаем
     if current_state is None:
         return
+    #пишем сообщение об отмене
     msg = await call.message.answer('❌ дейстивие отменено')
+    #запускаем таймер и удаляем сообщение бота
     date_15s = datetime.now() + timedelta(seconds=15)
     scheduler.add_job(message_delete, "date", run_date=date_15s, kwargs={"message":msg})
+    #закрываем стейт
     await state.finish()
 
 #====================reg=handler================
 
-
-
+#регистратор
 def reg_handler(dp):
+    #Запуск команды /start
     dp.register_message_handler(start_command, commands='start')
+    #Запуск команды /help
+    dp.register_message_handler(help_command, commands='help')
+    #Запуск команды /help
+    dp.register_message_handler(last_command, commands='last')
+    #Запуск команды /help
+    dp.register_message_handler(connect_command, commands='connect')
+    #Запуск высчитывания с ндфл
     dp.register_message_handler(ndfl_true_handler, text='Высчитывать с НДФЛ', state=None)
+    #Запуск высчитывания без ндфл
     dp.register_message_handler(ndfl_false_handler, text='Высчитывать без НДФЛ', state=None)
-
+    #тест для админа
     dp.register_message_handler(test_persent, text='test')
-
+    #настройки бота
     dp.register_message_handler(setting_bot, text='Настройки')
-
+    #логи для стейтов с ндфл
     dp.register_message_handler(bet_hour, state=deduction_from_personal_income_tax.rate_per_hour)
     dp.register_message_handler(hour_work, state=deduction_from_personal_income_tax.hours_worked)
-
+    #логи для стейтов без ндфл
     dp.register_message_handler(bet_hour_false, state=deduction_from_personal_income_tax_false.rate_per_hour)
     dp.register_message_handler(hour_work_false, state=deduction_from_personal_income_tax_false.hours_worked)
-
+    #логи для стейтов настройки
     dp.register_message_handler(setting_ndfl_state, state=state_setting_ndfl.ndfl_setting_state)
+    #ловля лишних сообщений
+    dp.register_message_handler(no_message)

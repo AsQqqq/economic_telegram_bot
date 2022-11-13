@@ -15,4 +15,24 @@ not_keyboard = InlineKeyboardMarkup(resize_keyboard = True)\
     InlineKeyboardButton(
         "Отменить", callback_data='stop_state'
     )
-    ) 
+    )
+
+setting_keyboard = InlineKeyboardMarkup(resize_keyboard = True)\
+    .add(
+    InlineKeyboardButton(
+        "Настройки процента НДФЛ", callback_data='edit_ndfl'
+    ))\
+    .add(
+    InlineKeyboardButton(
+        "Текущий процент НДФЛ", callback_data='persent_ndfl'
+    ))\
+    .add(
+    InlineKeyboardButton(
+        "Помощь с командами", callback_data='help_commands'
+    ))
+
+editNdfl_keyboard = InlineKeyboardMarkup(resize_keyboard = True)\
+    .add(
+    InlineKeyboardButton(
+        "Изменить", callback_data='edit_ndfl'
+    ))
