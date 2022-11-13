@@ -20,14 +20,7 @@ async def start_command(message: types.Message):
     #удаление последнего сообщения пользователя
     await message.delete()
     #выводим сообщение пользователю вместе с клавиатурой
-    msg = await message.answer("hello!", reply_markup = main_menu_kb)
-
-    #создаем переменную с секундами
-    date_240s = datetime.now() + timedelta(seconds=240)
-    #через scheduler выполняем выше сказанные секунды и после удаляем сообщение по айди
-    scheduler.add_job(message_delete, "date", run_date=date_240s, kwargs={"message":msg})
-    #выводим в консоль выполнения команды /start
-    print("\n================\nNew message\n================\n")
+    await message.answer("Привет!", reply_markup = main_menu_kb)
 
 #только для админа, запускается текстом test
 async def test_persent(message: types.Message):
