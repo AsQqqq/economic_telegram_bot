@@ -296,3 +296,4 @@ cython_debug/
 config.py
 venv/
 .edea
+start_bot.bat
